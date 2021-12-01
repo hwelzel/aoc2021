@@ -1,0 +1,8 @@
+.clangd
+build-*/
+build/
+*.pyc
+*.dmp
+*~
+compile_commands.json
+.gitreview
