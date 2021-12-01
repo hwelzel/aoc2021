@@ -2,33 +2,31 @@
 #include <range/v3/distance.hpp>
 #include <range/v3/functional/comparisons.hpp>
 #include <range/v3/view/adjacent_filter.hpp>
+#include <range/v3/view/sliding.hpp>
+#include <range/v3/view/transform.hpp>
+#include <range/v3/numeric/accumulate.hpp>
 
 #include <array>
 
 namespace {
 
 auto count_adj_increases(const auto& input) {
-    if (input.empty()) {
-        return 0l;
-    }
+    assert(!input.empty());
     return ranges::distance(ranges::views::adjacent_filter(input, ranges::less())) - 1;
 }
 
-auto test(const auto& input) {
-    fmt::print("testing: {{{}}}\n", fmt::join(input, ", "));
-    fmt::print("measurements increased {} time(s)\n", count_adj_increases(input));
+template <size_t window>
+auto count_sliding_adj_increases(const auto& input) {
+    assert(!input.empty());
+    const auto sums = ranges::views::sliding(input, window)
+            | ranges::views::transform([](const auto& c) { return ranges::accumulate(c, 0.0); });
+    return ranges::distance(ranges::views::adjacent_filter(sums, ranges::less())) - 1;
 }
 
 } // namespace
 
 int main() {
-    test(std::array{1, 2, 2, 3, 2});
-    test(std::array{1.0, 2.0, 2.0, 3.0, 2.0});
-    test(std::array{1.0});
-    test(std::array<double, 0>{});
-    test(std::array{1.0, 2.0, 2.0, 3.0, 2.0, 1.0, 44.0, 55.0, 55.0, 33.0});
-    test(std::array{3.0, 2.0, 1.0});
-    test(std::array{
+    constexpr auto arr = std::array{
             156.0,  176.0,  175.0,  176.0,  183.0,  157.0,  150.0,  153.0,  154.0,  170.0,  162.0,
             167.0,  170.0,  188.0,  190.0,  194.0,  196.0,  198.0,  202.0,  203.0,  187.0,  189.0,
             194.0,  213.0,  216.0,  217.0,  224.0,  217.0,  216.0,  224.0,  237.0,  251.0,  259.0,
@@ -210,5 +208,12 @@ int main() {
             5120.0, 5113.0, 5126.0, 5130.0, 5156.0, 5158.0, 5159.0, 5163.0, 5162.0, 5125.0, 5126.0,
             5135.0, 5162.0, 5166.0, 5173.0, 5169.0, 5177.0, 5183.0, 5199.0, 5200.0, 5188.0, 5191.0,
             5192.0, 5184.0, 5193.0, 5203.0, 5206.0, 5214.0, 5219.0, 5215.0, 5230.0, 5231.0, 5208.0,
-            5207.0, 5208.0, 5181.0, 5161.0, 5162.0, 5164.0, 5189.0, 5190.0, 5170.0});
+            5207.0, 5208.0, 5181.0, 5161.0, 5162.0, 5164.0, 5189.0, 5190.0, 5170.0};
+
+    const auto n = count_adj_increases(arr);
+    fmt::print("measurements increased {} time(s)\n", n);
+
+    constexpr auto window = 3;
+    const auto n_sliding = count_sliding_adj_increases<window>(arr);
+    fmt::print("measurements increased {} time(s) with sliding window of {}\n", n_sliding, window);
 }
