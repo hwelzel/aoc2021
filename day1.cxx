@@ -17,10 +17,9 @@ auto count_adj_increases(const auto& input) {
 
 template <size_t window>
 auto count_sliding_adj_increases(const auto& input) {
-    assert(!input.empty());
     const auto sums = ranges::views::sliding(input, window)
             | ranges::views::transform([](const auto& c) { return ranges::accumulate(c, 0.0); });
-    return ranges::distance(ranges::views::adjacent_filter(sums, ranges::less())) - 1;
+    return count_adj_increases(sums);
 }
 
 } // namespace
