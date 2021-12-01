@@ -45,3 +45,4 @@ function(add_day_executable TARGET)
 endfunction()
 
 add_day_executable(day1 day1.cxx)
+add_day_executable(day1_constexpr day1_constexpr.cxx)
