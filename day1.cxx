@@ -12,12 +12,12 @@ namespace {
 
 auto count_adj_increases(const auto& input) {
     assert(!input.empty());
-    return ranges::distance(ranges::views::adjacent_filter(input, ranges::less())) - 1;
+    return ranges::distance(input | ranges::views::adjacent_filter(ranges::less{})) - 1;
 }
 
 template <size_t window>
 auto count_sliding_adj_increases(const auto& input) {
-    const auto sums = ranges::views::sliding(input, window)
+    const auto sums = input | ranges::views::sliding(window)
             | ranges::views::transform([](const auto& c) { return ranges::accumulate(c, 0.0); });
     return count_adj_increases(sums);
 }
