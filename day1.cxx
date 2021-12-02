@@ -211,8 +211,14 @@ int main() {
 
     const auto n = count_adj_increases(arr);
     fmt::print("measurements increased {} time(s)\n", n);
+    if (n != 1393) {
+        throw std::runtime_error("Wrong... :(");
+    }
 
     constexpr auto window = 3;
     const auto n_sliding = count_sliding_adj_increases<window>(arr);
     fmt::print("measurements increased {} time(s) with sliding window of {}\n", n_sliding, window);
+    if (n_sliding != 1359) {
+        throw std::runtime_error("Wrong... :(");
+    }
 }
